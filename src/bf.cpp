@@ -51,9 +51,7 @@ std::vector<Command> parse(std::string source) {
     std::vector<Command> output;
     std::vector<std::size_t> loopStack;
 
-    for (int i = 0; i < source.size(); i++) {
-        char character = source[i];
-
+    for (char character : source) {
         switch (character) {
             case '+':{
             output.push_back(Command(CommandType::Increment));
