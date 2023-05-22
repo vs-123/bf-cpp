@@ -8,8 +8,6 @@
 
 #include "bf.h"
 
-using namespace std;
-
 const size_t MEMORY_SIZE = 30000;
 
 std::ostream& operator<<(std::ostream& output, const CommandType& cmdType) {
@@ -49,9 +47,9 @@ std::ostream& operator<<(std::ostream& output, const Command& cmd) {
     return output;
 }
 
-vector<Command> parse(string source) {
-    vector<Command> output;
-    vector<size_t> loopStack;
+std::vector<Command> parse(std::string source) {
+    std::vector<Command> output;
+    std::vector<std::size_t> loopStack;
 
     for (int i = 0; i < source.size(); i++) {
         char character = source[i];
@@ -81,8 +79,8 @@ vector<Command> parse(string source) {
 
             case ']':{
             if (loopStack.size() < 1) {
-                cout << "[Error at command index " << output.size() << "]";
-                cout << "Unmatched ']'\n";
+                std::cout << "[Error at command index " << output.size() << "]";
+                std::cout << "Unmatched ']'\n";
                 exit(1);
             }
             size_t loopStart = loopStack.back();
@@ -106,10 +104,10 @@ vector<Command> parse(string source) {
     return output;
 }
 
-void interpret(vector<Command> commands) {
-    uint8_t memory[MEMORY_SIZE];
-    size_t pointer = 0;
-    size_t commandIndex = 0;
+void interpret(std::vector<Command> commands) {
+    std::uint8_t memory[MEMORY_SIZE];
+    std::size_t pointer = 0;
+    std::size_t commandIndex = 0;
 
     while (commandIndex < commands.size()) {
         Command command = commands[commandIndex];
@@ -132,12 +130,12 @@ void interpret(vector<Command> commands) {
             }break;
 
             case CommandType::PrintCell:{
-                cout << char(memory[pointer]);
+                std::cout << char(memory[pointer]);
             }break;
 
             case CommandType::InputCell:{
                 char c;
-                cin >> c;
+                std::cin >> c;
                 memory[pointer] = size_t(c);
             }break;
 
@@ -152,7 +150,7 @@ void interpret(vector<Command> commands) {
             }break;
 
             default:{
-                cout << "[Error]" << endl << command << " " << commands.size() << endl;
+                std::cout << "[Error]" << std::endl << command << " " << commands.size() << std::endl;
             }break;
         }
 
