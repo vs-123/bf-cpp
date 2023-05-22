@@ -5,10 +5,24 @@
 #include <vector>
 #include <cstring>
 #include <limits>
+#include <algorithm>
+#include <memory>
+#include <stdexcept>
 
 #include "bf.h"
 
 const size_t MEMORY_SIZE = 30000;
+
+template<typename ... Args>
+std::string string_format( const std::string& format, Args ... args )
+{
+    int size_s = std::snprintf( nullptr, 0, format.c_str(), args ... ) + 1; // Extra space for '\0'
+    if( size_s <= 0 ){ throw std::runtime_error( "Error during formatting." ); }
+    auto size = static_cast<size_t>( size_s );
+    std::unique_ptr<char[]> buf( new char[ size ] );
+    std::snprintf( buf.get(), size, format.c_str(), args ... );
+    return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
+}
 
 std::ostream& operator<<(std::ostream& output, const CommandType& cmdType) {
     switch(cmdType) {
@@ -77,9 +91,7 @@ std::vector<Command> parse(std::string source) {
 
             case ']':{
             if (loopStack.size() < 1) {
-                std::cout << "[Error at command index " << output.size() << "]";
-                std::cout << "Unmatched ']'\n";
-                exit(1);
+                throw std::runtime_error(string_format("[Error at command index %d]\nUnmatched ']'", output.size()));
             }
             size_t loopStart = loopStack.back();
             output[loopStart] = Command(CommandType::LoopOpen, output.size());
@@ -108,7 +120,7 @@ void interpret(std::vector<Command> commands) {
     std::size_t commandIndex = 0;
 
     while (commandIndex < commands.size()) {
-        Command command = commands[commandIndex];
+        const Command& command = commands[commandIndex];
 
         switch (command.type) {
             case CommandType::Increment:{
@@ -148,7 +160,7 @@ void interpret(std::vector<Command> commands) {
             }break;
 
             default:{
-                std::cout << "[Error]" << std::endl << command << " " << commands.size() << std::endl;
+                throw std::runtime_error("Unimplemented CommandType");
             }break;
         }
 
